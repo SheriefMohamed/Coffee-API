@@ -1,7 +1,7 @@
-import express, { NextFunction } from 'express';
+import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { PORT } from './config/config';
+import { PORT, NODE_ENV } from './config/config';
 import { ItemsRoute } from './routes/items-route'
 import errorHandler from './middlewares/errorHandler';
 
@@ -14,5 +14,5 @@ app.use('/items', ItemsRoute)
 app.use(errorHandler);
 
 app.listen(PORT, async () => {
-    console.log(`Running on port ${PORT}`)
+    console.log(`Running on port ${PORT} in ${NODE_ENV} mode`)
 })

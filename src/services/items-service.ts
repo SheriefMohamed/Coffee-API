@@ -1,6 +1,7 @@
 import { pool } from "../config/database";
 import { RowDataPacket } from 'mysql2';
 import { Item } from "../interfaces/Item";
+import { ErrorTracker } from "../middlewares/errorTracker";
 
 export class ItemsService{
     insertItem = async (data: Item) => {
@@ -30,11 +31,17 @@ export class ItemsService{
         const [rows] = await pool.query(`UPDATE items SET 
         name = '${name}', category = '${category}', price = ${price}
         WHERE id = ${itemId}`);
-        return rows
+        if ('affectedRows' in rows) {
+            const affectedRows = rows.affectedRows;
+            return affectedRows
+        }
     }
 
     deleteItem = async (itemId: number) => {
         const [rows] = await pool.query(`DELETE FROM items WHERE id = ${itemId}`);
-        return rows
+        if ('affectedRows' in rows) {
+            const affectedRows = rows.affectedRows;
+            return affectedRows
+        }        
     }
 }

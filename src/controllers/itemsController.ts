@@ -4,16 +4,8 @@ import { ItemsService } from "../services/items-service";
 import asyncHandler from 'express-async-handler';
 import { Item } from "../interfaces/Item";
 import { ErrorTracker } from "../middlewares/errorTracker";
-
-interface Json {
-    success: boolean;
-    data: Item | Item[];
-    message?: string
-}
-
-type CustomResponse<T> = Response & {
-    json: (body?: T) => CustomResponse<T>;
-}
+import { validateItem } from "../utils/validators/itemValidator";
+import {Json, CustomResponse} from '../types/customResponse'
 
 export class ItemsController{
     public itemsService: ItemsService;
@@ -22,17 +14,27 @@ export class ItemsController{
         this.itemsService = new ItemsService()
     }
 
-    insertItem = asyncHandler(async (req: RequestWithBody, res: CustomResponse<Json>) => {
+    insertItem = asyncHandler(async (req: RequestWithBody, res: CustomResponse<Json>, next: NextFunction) => {
         const {name, category, price} = req.body;
-        if(name && category && price){
-            await this.itemsService.insertItem({
-                name: String(name), 
-                category: String(category),
-                price: parseFloat(price)
-            })
-            res.json({'success': true, message: 'Item inserted !'})  
+        
+        if(name && category && price ){
+            const item: Item = {
+                name: name,
+                category: category,
+                price: parseFloat(price),
+            };
+            const validationError = validateItem(item)
+    
+            if (validationError) {
+                return next(new ErrorTracker(validationError.join(', '), 400));
+            }
+    
+            await this.itemsService.insertItem(item)
+            res.json({'success': true, message: 'Item inserted !'})
+            return
         }
-        res.json({'success': false, message: 'Error !'})
+        
+        return next(new ErrorTracker('Invalid input types', 400));
     });
 
     getAllItems = asyncHandler(async (req: RequestWithBody, res: CustomResponse<Json>, next: NextFunction) => {
@@ -42,34 +44,72 @@ export class ItemsController{
         return
     });
 
-    getSingleItem = asyncHandler(async (req: RequestWithBody, res: CustomResponse<Json>) => {
-        const itemId: number = parseInt(req.params.itemId)
-        const item = await this.itemsService.getSingleItem(itemId)
-        
-        res.json({'success': true, data: item})   
-        return   
-    });
-
-    updatedItem = asyncHandler(async (req: RequestWithBody, res: CustomResponse<Json>) => {
-        const {name, category, price} = req.body;
-        if(name && category && price && req.params.itemId){
-            const itemId: number = parseInt(req.params.itemId)
-            await this.itemsService.updateItem(itemId,{
-                name: String(name), 
-                category: String(category),
-                price: parseFloat(price)
-            })
-            res.json({'success': true, message: 'Item updated !'})
+    getSingleItem = asyncHandler(async (req: RequestWithBody, res: CustomResponse<Json>, next: NextFunction) => { 
+        if(!/^\d+$/.test(req.params.itemId)){
+            next(new ErrorTracker("Item Id Should be a number !", 400))
             return
         }
-        res.json({'success': false, message: 'Error !'})
+        
+        const itemId: number = parseInt(req.params.itemId)
+        const item = await this.itemsService.getSingleItem(itemId)
+            
+        if(!item){
+            next(new ErrorTracker('No items found !', 404))
+            return
+        }
+        
+        res.json({'success': true, data: item})   
         return
     });
 
-    deleteItem = asyncHandler(async (req: RequestWithBody, res: CustomResponse<Json>) => {
+    updatedItem = asyncHandler(async (req: RequestWithBody, res: CustomResponse<Json>, next: NextFunction) => {
+        const {name, category, price} = req.body;
+
+        if(name && category && price && req.params.itemId){
+            if(!/^\d+$/.test(req.params.itemId)){
+                next(new ErrorTracker("Item Id Should be a number !", 400))
+                return
+            }
+
+            const itemId: number = parseInt(req.params.itemId)
+            const item: Item = {
+                name: name,
+                category: category,
+                price: parseFloat(price),
+            };
+
+            const validationError = validateItem(item)   
+            if (validationError) {
+                return next(new ErrorTracker(validationError.join(', '), 400));
+            }
+            
+            const rows = await this.itemsService.updateItem(itemId, item)
+            if(rows == 0){
+                next(new ErrorTracker('No items found !', 404))
+                return
+            }
+
+            res.json({'success': true, message: 'Item updated !'})
+            return
+        }
+
+        return next(new ErrorTracker('Invalid input types', 400));
+    });
+
+    deleteItem = asyncHandler(async (req: RequestWithBody, res: CustomResponse<Json>, next: NextFunction) => {
+        if(!/^\d+$/.test(req.params.itemId)){
+            next(new ErrorTracker("Item Id Should be a number !", 400))
+            return
+        }
+
         const itemId: number = parseInt(req.params.itemId)
-        const item = await this.itemsService.deleteItem(itemId)
-        
+        const rows = await this.itemsService.deleteItem(itemId)
+
+        if(rows == 0){
+            next(new ErrorTracker('No items found !', 404))
+            return
+        }
+
         res.json({'success': true, message: 'Item deleted !'})     
         return 
     });
