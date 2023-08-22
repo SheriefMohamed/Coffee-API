@@ -1,0 +1,40 @@
+{
+  "name": "coffee-api",
+  "version": "1.0.0",
+  "description": "Api using Node.js and Typescript",
+  "main": "index.js",
+  "scripts": {
+    "start:build": "tsc -w",
+    "start:run": "nodemon build/index.js",
+    "start": "concurrently npm:start:*",
+    "dev": "SET NODE_ENV=DEVELOPMENT& concurrently npm:start:*",
+    "prod": "SET NODE_ENV=PRODUCTION& concurrently npm:start:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SheriefMohamed/Coffee-API.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SheriefMohamed/Coffee-API/issues"
+  },
+  "homepage": "https://github.com/SheriefMohamed/Coffee-API#readme",
+  "dependencies": {
+    "@types/body-parser": "^1.19.2",
+    "@types/cookie-parser": "^1.4.3",
+    "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.17",
+    "@types/joi": "^17.2.3",
+    "body-parser": "^1.20.2",
+    "concurrently": "^8.2.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
+    "joi": "^17.9.2",
+    "mysql2": "^3.6.0",
+    "nodemon": "^3.0.1"
+  }
+}
