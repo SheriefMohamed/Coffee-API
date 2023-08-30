@@ -1,4 +1,4 @@
-import { Response, NextFunction } from "express";
+import { NextFunction } from "express";
 import { RequestWithBody } from "../interfaces/RequestWithBody";
 import { ItemsService } from "../services/items-service";
 import asyncHandler from 'express-async-handler';
@@ -23,7 +23,7 @@ export class ItemsController{
                 category: category,
                 price: parseFloat(price),
             };
-            const validationError = validateItem(item)
+            const validationError = await validateItem(item)
     
             if (validationError) {
                 return next(new ErrorTracker(validationError.join(', '), 400));
@@ -78,7 +78,7 @@ export class ItemsController{
                 price: parseFloat(price),
             };
 
-            const validationError = validateItem(item)   
+            const validationError = await validateItem(item)   
             if (validationError) {
                 return next(new ErrorTracker(validationError.join(', '), 400));
             }
@@ -95,26 +95,4 @@ export class ItemsController{
 
         return next(new ErrorTracker('Invalid input types', 400));
     });
-
-    deleteItem = asyncHandler(async (req: RequestWithBody, res: CustomResponse<Json>, next: NextFunction) => {
-        if(!/^\d+$/.test(req.params.itemId)){
-            next(new ErrorTracker("Item Id Should be a number !", 400))
-            return
-        }
-
-        const itemId: number = parseInt(req.params.itemId)
-        const rows = await this.itemsService.deleteItem(itemId)
-
-        if(rows == 0){
-            next(new ErrorTracker('No items found !', 404))
-            return
-        }
-
-        res.json({'success': true, message: 'Item deleted !'})     
-        return 
-    });
 }
-
-
-// next(new ErrorTracker('Any error !', 404))
-// return
