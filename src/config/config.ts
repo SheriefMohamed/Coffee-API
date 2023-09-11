@@ -12,3 +12,9 @@ export const DB_USER = process.env.DB_USER;
 export const DATABASE = process.env.DATABASE; 
 
 export const DB_PASSWORD = process.env.DB_PASSWORD; 
+
+export const JWT_SECRET = process.env.JWT_SECRET as string; 
+
+export const JWT_EXPIRES_TIME = process.env.JWT_EXPIRES_TIME as string; 
+
+export const COOKIE_EXPIRES_TIME = Number(process.env.COOKIE_EXPIRES_TIME) as number; 

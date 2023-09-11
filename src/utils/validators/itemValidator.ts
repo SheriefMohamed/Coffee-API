@@ -1,4 +1,4 @@
-import Joi, { string } from 'joi';
+import Joi from 'joi';
 import { Item } from '../../interfaces/Item';
 import { categoryService } from './../../services/category-service';
 

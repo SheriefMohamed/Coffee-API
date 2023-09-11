@@ -13,7 +13,7 @@ export class categoryService{
     }
 
     getAllCategories = async () => {
-        const [rows] = await pool.query(`SELECT id, name FROM category`)
+        const [rows] = await pool.query(`SELECT * FROM category`)
         return rows
     }
 
@@ -24,7 +24,7 @@ export class categoryService{
     }
 
     getSingleCategory = async (categoryId: number) => {
-        const [rows] = await pool.query(`SELECT id, name FROM category WHERE id = ${categoryId}`);
+        const [rows] = await pool.query(`SELECT * FROM category WHERE id = ${categoryId}`);
         if (Array.isArray(rows) && rows.length > 0) {
             const firstRow = rows[0] as RowDataPacket;
             return firstRow
