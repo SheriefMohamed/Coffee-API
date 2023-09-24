@@ -16,6 +16,7 @@ export const isAuthenticated = asyncHandler(async (req: RequestWithBody, res: Cu
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload
     const staffService = new StaffService()
     req.staff = await staffService.getStaffTokenData(decoded.email) as stafftokenData
+    delete req.staff.password
     next();
 })
 

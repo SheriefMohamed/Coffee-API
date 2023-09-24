@@ -17,6 +17,12 @@ export class ItemsService{
         return rows
     }
 
+    getArrayOfItems = async () => {
+        const [rows] = await pool.query(`SELECT id FROM item`)
+        const itemsIds: number[] = (rows as RowDataPacket[]).map((row: any) => row.id);
+        return itemsIds;
+    }
+
     getSingleItem = async (itemId: number) => {
         const [rows] = await pool.query(`SELECT id, name, (SELECT name FROM category WHERE id = category_id) AS category, price FROM item WHERE id = ${itemId}`);
         if (Array.isArray(rows) && rows.length > 0) {

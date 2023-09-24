@@ -1,10 +1,10 @@
 export interface Order{
-    table_number: number;
-    staff_id: number;
+    table_number: number | string;
+    staff_id: number | string;
     items: ItemLine[];
 }
 
-interface ItemLine{
+export interface ItemLine{
     item_id: number;
     quantity: number;
 }

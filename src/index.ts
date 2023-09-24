@@ -6,6 +6,7 @@ import { ItemsRoute } from './routes/items-route'
 import { CategoryRoute } from './routes/category-route'
 import { PositionRoute } from './routes/position-route'
 import { AuthRoute } from './routes/auth-routes'
+import { OrderRoute } from './routes/order-routes'
 import errorHandler from './middlewares/errorHandler';
 import { StaffRoute } from './routes/staff-route';
 
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 app.use('/items', ItemsRoute);
 app.use('/categories', CategoryRoute);
 app.use('/positions', PositionRoute);
+app.use('/order', OrderRoute)
 app.use('/staff', StaffRoute)
 app.use('/auth', AuthRoute)
 app.use(errorHandler);
